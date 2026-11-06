@@ -99,3 +99,7 @@ docker compose exec web bin/brakeman --quiet --no-pager
 
 - `Dockerfile.dev` + `compose.yaml` are for development. The generated `Dockerfile` is the Rails production image and is not used by Compose.
 - Database connection in Compose: `DATABASE_HOST`, `DATABASE_USERNAME`, `DATABASE_PASSWORD`, `DATABASE_NAME` (see `config/database.yml`).
+
+## License
+
+Released under the [MIT License](LICENSE). Copyright (c) 2026 Nestor Lozynskyi.
