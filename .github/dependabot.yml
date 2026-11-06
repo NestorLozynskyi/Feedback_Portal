@@ -1,12 +1,13 @@
 version: 2
+# Kept for demonstration only: open-pull-requests-limit: 0 disables version-update pull requests.
 updates:
 - package-ecosystem: bundler
   directory: "/"
   schedule:
     interval: weekly
-  open-pull-requests-limit: 10
+  open-pull-requests-limit: 0
 - package-ecosystem: github-actions
   directory: "/"
   schedule:
     interval: weekly
-  open-pull-requests-limit: 10
+  open-pull-requests-limit: 0

@@ -1,9 +1,8 @@
 name: CI
 
+# Runs only manually (Actions → CI → Run workflow); automatic triggers are disabled.
 on:
-  pull_request:
-  push:
-    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   scan_ruby:
