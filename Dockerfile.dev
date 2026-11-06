@@ -1,0 +1,21 @@
+# syntax=docker/dockerfile:1
+# Development image used by compose.yaml (the generated Dockerfile is for production).
+ARG RUBY_VERSION=3.4.12
+FROM docker.io/library/ruby:$RUBY_VERSION-slim
+
+RUN apt-get update -qq && \
+    apt-get install --no-install-recommends -y build-essential git libpq-dev libyaml-dev pkg-config curl postgresql-client && \
+    rm -rf /var/lib/apt/lists /var/cache/apt/archives
+
+WORKDIR /rails
+ENV BUNDLE_PATH=/usr/local/bundle \
+    BUNDLE_JOBS=4
+
+COPY Gemfile Gemfile.lock .ruby-version ./
+RUN bundle install
+
+COPY . .
+
+ENTRYPOINT ["/rails/bin/docker-dev-entrypoint"]
+EXPOSE 3000
+CMD ["bin/rails", "server", "-b", "0.0.0.0", "-p", "3000"]

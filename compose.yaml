@@ -1,0 +1,45 @@
+name: feedback-portal
+
+x-app: &app
+  build:
+    context: .
+    dockerfile: Dockerfile.dev
+  environment:
+    DATABASE_HOST: db
+    DATABASE_USERNAME: postgres
+    DATABASE_PASSWORD: postgres
+  volumes:
+    - .:/rails
+    - bundle:/usr/local/bundle
+  depends_on:
+    db:
+      condition: service_healthy
+
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+  web:
+    <<: *app
+    command: bash -c "bin/rails tailwindcss:build && bin/rails server -b 0.0.0.0 -p 3000"
+    ports:
+      - "${WEB_PORT:-3000}:3000"
+
+  css:
+    <<: *app
+    command: bin/rails tailwindcss:watch[always]
+    tty: true
+
+volumes:
+  pgdata:
+  bundle:
