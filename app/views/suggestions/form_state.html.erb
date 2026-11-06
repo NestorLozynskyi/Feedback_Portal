@@ -1,0 +1,28 @@
+<% s = @suggestion
+   editing = s.persisted?
+   back = editing ? suggestion_path(s) : root_path
+   back_label = editing ? "Back to suggestion" : "Back to board" %>
+<% content_for :title, editing ? "Edit suggestion" : "New suggestion" %>
+<% content_for :nav, "board" %>
+<div class="page-container page">
+  <div class="form-narrow">
+    <%= link_to back, class: "back-link" do %><%= icon(:arrow_left) %><%= back_label %><% end %>
+    <% case @state %>
+    <% when :guest %>
+      <%= empty_state(:lock, "Sign in to share a suggestion", "Anyone can browse the board. To post ideas, feature requests or bug reports, sign in or create a free account.", heading: :h1) do %>
+        <div class="od-cluster" style="justify-content:center">
+          <%= link_to "Sign in", signin_path_for("create"), class: "btn btn-primary" %>
+          <%= link_to "Create account", signup_path_with_return, class: "btn btn-secondary" %>
+        </div>
+      <% end %>
+    <% when :restricted %>
+      <%= empty_state(:lock, editing ? "You can’t edit this suggestion" : "You can’t create suggestions", "Your account is restricted, so creating and editing suggestions is unavailable.", heading: :h1) do %>
+        <%= link_to back_label, back, class: "btn btn-secondary" %>
+      <% end %>
+    <% when :not_editable %>
+      <%= empty_state(:lock, "You can’t edit this suggestion", s.hidden? ? "It was hidden by a moderator, so editing is unavailable." : "Only the author can edit a suggestion.", heading: :h1) do %>
+        <%= link_to "Back to suggestion", back, class: "btn btn-secondary" %>
+      <% end %>
+    <% end %>
+  </div>
+</div>

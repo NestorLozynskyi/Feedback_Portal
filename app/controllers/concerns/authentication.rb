@@ -30,8 +30,8 @@ module Authentication
     end
 
     def request_authentication
-      session[:return_to_after_authenticating] = request.url
-      redirect_to new_session_path
+      store_return_to
+      redirect_to new_session_path, status: :see_other
     end
 
     def after_authentication_url

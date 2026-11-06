@@ -10,7 +10,13 @@ module ActiveSupport
 
     # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
     fixtures :all
-
-    # Add more helper methods to be used by all tests here...
   end
+end
+
+module TurboStreamTestHelper
+  TURBO = { "Accept" => "text/vnd.turbo-stream.html, text/html, application/xhtml+xml" }.freeze
+end
+
+ActiveSupport.on_load(:action_dispatch_integration_test) do
+  include TurboStreamTestHelper
 end

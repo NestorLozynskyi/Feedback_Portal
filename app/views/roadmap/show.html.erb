@@ -1,0 +1,41 @@
+<% content_for :title, "Roadmap" %>
+<% content_for :nav, "roadmap" %>
+<% content_for :page, "roadmap" %>
+<% descs = { "planned" => "Accepted and scheduled.", "in_progress" => "Currently being built.", "completed" => "Shipped and available." } %>
+<div class="page-container page" data-controller="tabs">
+  <div class="page-head"><div class="page-head-text"><h1 class="page-title">Roadmap</h1>
+    <p class="page-lead">What we’re planning, building and have shipped. Suggestions appear here once they’re Planned, In Progress or Completed.</p></div></div>
+  <div class="rm-tabs" role="tablist" aria-label="Roadmap columns">
+    <% @columns.each_key do |st| css = Suggestion::STATUSES[st][:css] %>
+      <button class="rm-tab" type="button" role="tab" id="tab-<%= css %>" aria-controls="col-<%= css %>" aria-selected="<%= st == "planned" %>" tabindex="<%= st == "planned" ? 0 : -1 %>"
+              data-col="<%= css %>" data-tabs-target="tab" data-action="tabs#select keydown->tabs#keydown"><%= Suggestion::STATUSES[st][:label] %></button>
+    <% end %>
+  </div>
+  <div class="rm-grid">
+    <% @columns.each do |st, items| css = Suggestion::STATUSES[st][:css] %>
+      <section class="rm-col<%= " is-active" if st == "planned" %>" data-status="<%= css %>" id="col-<%= css %>" role="tabpanel" aria-labelledby="col-title-<%= css %>" data-tabs-target="panel">
+        <div class="rm-col-head">
+          <h2 class="rm-col-title" id="col-title-<%= css %>"><span class="dot" aria-hidden="true"></span><%= Suggestion::STATUSES[st][:label] %> <span class="count-pill"><%= items.size %></span></h2>
+          <p class="rm-col-desc"><%= descs[st] %></p>
+        </div>
+        <% if items.any? %>
+          <ul class="rm-list" role="list">
+            <% items.each do |s| %>
+              <li><%= link_to suggestion_path(s), class: "rm-card#{" is-hidden" if s.hidden?}" do %>
+                <% if s.hidden? %><span><%= hidden_badge %></span><% end %>
+                <span class="rm-card-title od-clamp-3"><%= s.title %></span>
+                <span class="meta od-cluster"><%= kind_chip(s) %><%= category_chip(s) %></span>
+                <span class="rm-card-foot">
+                  <span class="rm-votes"><%= icon(:chevron_up) %><%= plural_count(s.votes_count, "vote") %></span>
+                  <span class="rm-votes"><%= icon(:message) %><%= @comment_counts.fetch(s.id, 0) %><span class="sr-only"> comments</span></span>
+                </span>
+              <% end %></li>
+            <% end %>
+          </ul>
+        <% else %>
+          <p class="rm-empty">Nothing here yet.</p>
+        <% end %>
+      </section>
+    <% end %>
+  </div>
+</div>

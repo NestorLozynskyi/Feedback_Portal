@@ -1,0 +1,36 @@
+<%# locals: (category:, editing:, count:) %>
+<% c = category %>
+<%= turbo_frame_tag dom_id(c, :frame) do %>
+  <% if editing == c %>
+    <% error = c.errors[:name].first %>
+    <li>
+      <%= form_with url: admin_category_path(c), method: :patch, scope: :category, class: "cat-rename", id: "rename-cat-form", html: { novalidate: true },
+            data: { controller: "validation escape-link", action: "submit->validation#submit keydown->escape-link#cancel" } do %>
+        <div class="field<%= " is-invalid" if error %>">
+          <label class="label" for="rename-cat">Rename “<%= c.name_was || c.name %>”</label>
+          <input class="input" id="rename-cat" name="category[name]" type="text" maxlength="60" value="<%= c.name %>" aria-describedby="rename-cat-error" autofocus
+                 data-validation-target="input" data-rules='<%= { required: "Enter a category name.", maxlength: [ 40, "Use 40 characters or fewer." ] }.to_json %>'>
+          <%= error_text("rename-cat", error) %>
+        </div>
+        <div class="cat-rename-actions">
+          <%= link_to "Cancel", admin_categories_path, class: "btn btn-secondary", data: { escape_link_target: "cancel" } %>
+          <button class="btn btn-primary" type="submit">Save</button>
+        </div>
+      <% end %>
+    </li>
+  <% else %>
+    <li>
+      <div class="cat-info od-field"><span class="cat-name"><%= c.name %></span><span class="cat-count"><%= plural_count(count, "suggestion") %></span></div>
+      <div class="cat-actions">
+        <%= link_to edit_admin_category_path(c), class: "link-btn", aria: { label: "Rename #{c.name}" } do %><%= icon(:pencil) %>Rename<% end %>
+        <%= form_with url: admin_category_path(c), method: :delete, class: "contents",
+              data: { turbo_frame: "_top", controller: "confirm", action: "submit->confirm#ask",
+                      confirm_title_value: "Delete “#{c.name}”?",
+                      confirm_body_value: count.positive? ? "#{plural_count(count, "suggestion")} use this category. They stay on the board and show as Uncategorized. This can’t be undone." : "No suggestions use this category. This can’t be undone.",
+                      confirm_label_value: "Delete category" } do %>
+          <button class="link-btn is-danger" type="submit" aria-label="Delete <%= c.name %>"><%= icon(:trash) %>Delete</button>
+        <% end %>
+      </div>
+    </li>
+  <% end %>
+<% end %>

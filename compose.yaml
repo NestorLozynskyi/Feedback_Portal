@@ -40,6 +40,20 @@ services:
     command: bin/rails tailwindcss:watch[always]
     tty: true
 
+  # Separate app instance + database for Playwright e2e (reset before each run).
+  e2e:
+    <<: *app
+    profiles: ["e2e"]
+    environment:
+      DATABASE_HOST: db
+      DATABASE_USERNAME: postgres
+      DATABASE_PASSWORD: postgres
+      DATABASE_NAME: feedback_portal_e2e
+      SIGNIN_RATE_LIMIT: "1000"
+    command: bash -c "bin/rails tailwindcss:build && bin/rails db:prepare && bin/rails server -b 0.0.0.0 -p 3000 -P tmp/pids/e2e.pid"
+    ports:
+      - "${E2E_PORT:-3100}:3000"
+
 volumes:
   pgdata:
   bundle:

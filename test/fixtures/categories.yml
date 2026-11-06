@@ -1,0 +1,6 @@
+ui:
+  name: UI/UX
+performance:
+  name: Performance
+security:
+  name: Security

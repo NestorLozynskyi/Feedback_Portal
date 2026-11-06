@@ -1,0 +1,20 @@
+<% content_for :title, "Create your account" %>
+<% content_for :page, "signup" %>
+<% err = ->(attr) { @user.errors[attr].first }
+   summary = [ [ "name", err.(:name) ], [ "email", err.(:email_address) ], [ "password", err.(:password) ] ].select(&:last) %>
+<div class="auth-page"><div class="card auth-card">
+  <div><h1 class="auth-title">Create your account</h1><p class="auth-lead">Join to share suggestions, vote and comment.</p></div>
+  <%= form_with url: registration_path, class: "auth-form", id: "signup-form", html: { novalidate: true },
+        data: { controller: "validation", action: "submit->validation#submit" } do %>
+    <%= error_summary(summary) %>
+    <%= form_field id: "name", name: "user[name]", label: "Name", autocomplete: "name", maxlength: 50, value: @user.name,
+          hint: "Shown next to your suggestions and comments.", error: err.(:name), rules: { required: "Enter your name." } %>
+    <%= form_field id: "email", name: "user[email_address]", label: "Email", type: :email, autocomplete: "email", value: @user.email_address,
+          error: err.(:email_address), rules: { required: "Enter your email address.", email: "Enter an email address like name@example.com." } %>
+    <%= form_field id: "password", name: "user[password]", label: "Password", type: :password, autocomplete: "new-password",
+          hint: "At least 8 characters.", error: err.(:password),
+          rules: { required: "Create a password.", minlength: [ 8, "Use at least 8 characters for your password." ] } %>
+    <button class="btn btn-primary btn-lg btn-block" type="submit">Create account</button>
+  <% end %>
+  <p class="auth-switch">Already have an account? <%= link_to "Sign in", new_session_path %></p>
+</div></div>

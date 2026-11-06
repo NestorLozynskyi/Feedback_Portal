@@ -1,0 +1,7 @@
+<% content_for :title, "Password updated" %>
+<% content_for :page, "reset" %>
+<div class="auth-page"><div class="card auth-card">
+  <div class="state-icon is-success"><%= icon(:check) %></div>
+  <div><h1 class="auth-title" tabindex="-1" data-controller="autofocus">Password updated</h1><p class="auth-lead">You can now sign in with your new password.</p></div>
+  <%= link_to "Sign in", new_session_path, class: "btn btn-primary btn-lg btn-block" %>
+</div></div>

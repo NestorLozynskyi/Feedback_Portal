@@ -27,7 +27,7 @@ default: &default
 
 development:
   <<: *default
-  database: feedback_portal_development
+  database: <%= ENV.fetch("DATABASE_NAME", "feedback_portal_development") %>
 
   # The specified database role being used to connect to PostgreSQL.
   # To create additional roles in PostgreSQL see `$ createuser --help`.

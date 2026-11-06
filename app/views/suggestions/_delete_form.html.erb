@@ -1,0 +1,9 @@
+<%# locals: (suggestion:, label:, css:) %>
+<% own = suggestion.authored_by?(current_user) %>
+<%= form_with url: suggestion_path(suggestion), method: :delete, class: "contents",
+      data: { turbo_frame: "_top", controller: "confirm", action: "submit->confirm#ask",
+              confirm_title_value: "Delete this suggestion?",
+              confirm_body_value: own ? "This permanently removes your suggestion with its votes and comments. This can’t be undone." : "This permanently removes the suggestion with its votes and comments for everyone, including the author. This can’t be undone.",
+              confirm_label_value: "Delete suggestion" } do %>
+  <button class="<%= css %>" type="submit"><%= icon(:trash) %><%= label %></button>
+<% end %>

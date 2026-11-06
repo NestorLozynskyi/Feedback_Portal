@@ -1,0 +1,29 @@
+<%# locals: (new_category: nil) %>
+<% error = new_category&.errors&.[](:name)&.first %>
+<div class="admin-stack" id="categories_admin">
+  <section class="card panel-pad" aria-label="Add a category">
+    <%= form_with url: admin_categories_path, scope: :category, class: "add-row", id: "add-cat-form", html: { novalidate: true },
+          data: { controller: "validation", action: "submit->validation#submit" } do %>
+      <div class="field<%= " is-invalid" if error %>">
+        <label class="label" for="new-cat">New category</label>
+        <input class="input" id="new-cat" name="category[name]" type="text" maxlength="60" aria-describedby="new-cat-error" value="<%= new_category&.name %>"
+               <%= "autofocus" if new_category %> data-validation-target="input"
+               data-rules='<%= { required: "Enter a category name.", maxlength: [ 40, "Use 40 characters or fewer." ] }.to_json %>'>
+        <%= error_text("new-cat", error) %>
+      </div>
+      <button class="btn btn-primary" type="submit"><%= icon(:plus) %>Add category</button>
+    <% end %>
+  </section>
+  <section class="card" aria-labelledby="cat-list-title">
+    <div class="panel-head"><h2 class="section-title" id="cat-list-title">All categories <span class="count-pill"><%= @categories.size %></span></h2></div>
+    <% if @categories.any? %>
+      <ul class="cat-list" role="list">
+        <% @categories.each do |c| %>
+          <%= render "admin/categories/category_frame", category: c, editing: nil, count: @counts.fetch(c.id, 0) %>
+        <% end %>
+      </ul>
+    <% else %>
+      <div class="panel-pad"><%= empty_state(:tag, "No categories yet", "Add your first category above. People choose one when they create a suggestion.") %></div>
+    <% end %>
+  </section>
+</div>

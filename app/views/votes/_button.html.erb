@@ -1,0 +1,23 @@
+<%# locals: (suggestion:, voted:, variant:) %>
+<% user = current_user
+   count = suggestion.votes_count
+   count_label = plural_count(count, "vote")
+   id = dom_id(suggestion, "vote_#{variant}")
+   css = [ "vote", "vote--#{variant}", ("is-voted" if voted) ].compact.join(" ")
+   ic = icon(voted ? :check : :chevron_up)
+   inner = if variant == "large"
+             ic + tag.span(voted ? "Upvoted" : "Upvote") + tag.span(count, class: "vote-count")
+           else
+             ic + tag.span(count, class: "vote-count")
+           end %>
+<% if !user %>
+  <%= link_to inner, signin_path_for("vote", return_to: suggestion_path(suggestion)), id: id, class: css, aria: { label: "Sign in to upvote, #{count_label}" } %>
+<% elsif suggestion.hidden? || user.blocked? %>
+  <button type="button" id="<%= id %>" class="<%= css %>" disabled aria-pressed="<%= voted %>"
+          <% if user.blocked? && !suggestion.hidden? %>aria-describedby="restricted-text"<% end %>
+          aria-label="<%= suggestion.hidden? ? "Voting is unavailable on hidden suggestions" : "Voting is unavailable while your account is restricted" %>, <%= count_label %>"><%= inner %></button>
+<% else %>
+  <%= form_with url: suggestion_vote_path(suggestion), method: (voted ? :delete : :post), id: id, class: "contents" do %>
+    <button type="submit" class="<%= css %>" aria-pressed="<%= voted %>" aria-label="<%= voted ? "Remove your upvote" : "Upvote" %>, <%= count_label %>"><%= inner %></button>
+  <% end %>
+<% end %>

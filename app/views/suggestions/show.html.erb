@@ -1,0 +1,7 @@
+<% content_for :title, @suggestion.title %>
+<% content_for :nav, "board" %>
+<% content_for :page, "suggestion" %>
+<div class="page-container page">
+  <%= link_to root_path, class: "back-link" do %><%= icon(:arrow_left) %>Back to board<% end %>
+  <%= render "suggestions/detail" %>
+</div>

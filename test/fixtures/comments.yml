@@ -1,0 +1,31 @@
+priya_on_planned:
+  suggestion: priya_planned
+  author: priya
+  body: Following the system setting would be perfect.
+  created_at: <%= 4.days.ago %>
+maya_on_planned:
+  suggestion: priya_planned
+  author: maya
+  body: Please keep label colors readable.
+  created_at: <%= 3.days.ago %>
+admin_on_planned:
+  suggestion: priya_planned
+  author: admin
+  body: This is planned for an upcoming release.
+  created_at: <%= 2.days.ago %>
+maya_hidden_on_planned:
+  suggestion: priya_planned
+  author: maya
+  body: An off-topic rant.
+  hidden: true
+  created_at: <%= 1.day.ago %>
+jordan_on_planned:
+  suggestion: priya_planned
+  author: jordan
+  body: True black backgrounds would be great.
+  created_at: <%= 1.day.ago %>
+priya_on_hidden:
+  suggestion: maya_hidden
+  author: priya
+  body: Isn't this the same as highlighting?
+  created_at: <%= 1.day.ago %>

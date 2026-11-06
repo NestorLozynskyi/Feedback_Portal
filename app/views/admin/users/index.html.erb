@@ -1,0 +1,8 @@
+<% content_for :title, "Users" %>
+<% content_for :nav, "admin-users" %>
+<% content_for :page, "admin-users" %>
+<div class="page-container page">
+  <div class="page-head"><div class="page-head-text"><h1 class="page-title">Users</h1>
+    <p class="page-lead">Blocked users can still sign in and browse, but can’t create suggestions, vote, comment or edit their content. Their existing posts and votes stay.</p></div></div>
+  <%= render "admin/users/table" %>
+</div>

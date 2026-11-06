@@ -1,0 +1,41 @@
+<%# locals: (suggestion:, comments:, new_comment: nil) %>
+<% user = current_user %>
+<section class="card comments" aria-labelledby="comments-title" id="comments">
+  <div class="comments-head"><h2 class="section-title" id="comments-title" tabindex="-1">Comments <span class="count-pill"><%= comments.size %></span></h2></div>
+  <% if suggestion.hidden? %>
+    <div class="notice"><%= icon(:lock) %><p class="notice-text">Comments are closed while this suggestion is hidden.</p></div>
+  <% elsif !user %>
+    <div class="composer-gate">
+      <p class="composer-gate-text">Sign in to join the discussion.</p>
+      <div class="od-cluster">
+        <%= link_to "Sign in", signin_path_for("comment", return_to: suggestion_path(suggestion)), class: "btn btn-primary btn-sm" %>
+        <%= link_to "Create account", signup_path_with_return(return_to: suggestion_path(suggestion)), class: "btn btn-secondary btn-sm" %>
+      </div>
+    </div>
+  <% elsif user.blocked? %>
+    <div class="notice notice-warn"><%= icon(:lock) %><p class="notice-text">You can’t comment while your account is restricted.</p></div>
+  <% else %>
+    <% error = new_comment&.errors&.[](:body)&.first %>
+    <%= form_with url: suggestion_comments_path(suggestion), scope: :comment, class: "composer", id: "comment-form", html: { novalidate: true },
+          data: { controller: "validation", action: "submit->validation#submit" } do %>
+      <div class="od-row-top composer-row"><%= avatar(user) %>
+        <div class="field od-fill<%= " is-invalid" if error %>">
+          <label class="label" for="comment-body">Add a comment</label>
+          <textarea class="textarea" id="comment-body" name="comment[body]" rows="3" maxlength="2000" aria-describedby="comment-body-error"
+                    data-validation-target="input" data-rules='<%= { required: "Write a comment before posting." }.to_json %>'><%= new_comment&.body %></textarea>
+          <%= error_text("comment-body", error) %>
+        </div>
+      </div>
+      <div class="composer-actions"><button class="btn btn-primary" type="submit">Post comment</button></div>
+    <% end %>
+  <% end %>
+  <% if comments.any? %>
+    <ol class="comment-list" role="list">
+      <% comments.each do |c| %>
+        <%= render "comments/comment_frame", comment: c, suggestion: suggestion, editing: nil %>
+      <% end %>
+    </ol>
+  <% else %>
+    <p class="empty-inline">No comments yet.<%= " Start the discussion." if suggestion.open_for_participation_by?(user) %></p>
+  <% end %>
+</section>

@@ -1,0 +1,8 @@
+<% content_for :title, "Suggestion not available" %>
+<% content_for :nav, "board" %>
+<div class="page-container page">
+  <%= link_to root_path, class: "back-link" do %><%= icon(:arrow_left) %>Back to board<% end %>
+  <%= empty_state(:eye_off, "This suggestion isn’t available", "It may have been deleted, or hidden by a moderator.", heading: :h1) do %>
+    <%= link_to "Back to board", root_path, class: "btn btn-secondary" %>
+  <% end %>
+</div>

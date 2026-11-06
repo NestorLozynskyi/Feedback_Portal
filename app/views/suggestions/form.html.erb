@@ -1,0 +1,82 @@
+<% s = @suggestion
+   editing = s.persisted?
+   back = editing ? suggestion_path(s) : root_path
+   errors = s.errors
+   err = ->(attr) { errors[attr].first }
+   summary = []
+   summary << [ "title", err.(:title) ] if err.(:title)
+   summary << [ "type-idea", err.(:kind) ] if err.(:kind)
+   summary << [ "category", err.(:category) ] if err.(:category)
+   summary << [ "description", err.(:body) ] if err.(:body) %>
+<% content_for :title, editing ? "Edit suggestion" : "New suggestion" %>
+<% content_for :nav, "board" %>
+<% content_for :page, "suggestion-form" %>
+<div class="page-container page">
+  <div class="form-narrow">
+    <%= link_to back, class: "back-link" do %><%= icon(:arrow_left) %><%= editing ? "Back to suggestion" : "Back to board" %><% end %>
+    <div class="card form-card">
+      <div>
+        <h1 class="page-title"><%= editing ? "Edit suggestion" : "New suggestion" %></h1>
+        <p class="page-lead"><%= editing ? "Update the details of your suggestion. Votes and comments stay as they are." : "Share an idea, request a feature or report a bug. Clear, specific suggestions get the most votes." %></p>
+      </div>
+      <%= form_with model: s, scope: :suggestion, url: (editing ? suggestion_path(s) : suggestions_path), class: "form-stack", id: "suggestion-form", html: { novalidate: true },
+            data: { controller: "validation", action: "submit->validation#submit" } do %>
+        <%= error_summary(summary) %>
+        <p class="form-legend-note"><%= required_mark %> Required</p>
+
+        <div class="field<%= " is-invalid" if err.(:title) %>" data-controller="counter" data-counter-max-value="120">
+          <div class="label-row">
+            <label class="label" for="title">Title <%= required_mark %></label>
+            <span class="counter" id="title-count" aria-live="polite" data-counter-target="output"><%= s.title.to_s.length %>/120</span>
+          </div>
+          <p class="hint" id="title-hint">Summarize your suggestion in one line.</p>
+          <input class="input" id="title" name="suggestion[title]" type="text" maxlength="120" required aria-required="true" aria-describedby="title-hint title-error"
+                 value="<%= s.title %>" data-counter-target="input" data-action="input->counter#update" data-validation-target="input"
+                 data-rules='<%= { required: "Enter a title for your suggestion.", minlength: [ 8, "Make the title at least 8 characters so people can understand it." ] }.to_json %>'
+                 <%= "aria-invalid=true" if err.(:title) %>>
+          <%= error_text("title", err.(:title)) %>
+        </div>
+
+        <fieldset class="field<%= " is-invalid" if err.(:kind) %>" aria-required="true">
+          <legend class="label">Type <%= required_mark %></legend>
+          <div class="choice-grid">
+            <% Suggestion::KINDS.each_with_index do |(key, info), i| %>
+              <label class="choice">
+                <input class="choice-input" type="radio" name="suggestion[kind]" value="<%= key %>" id="type-<%= key %>"<%= " checked" if s.kind == key %>
+                       <% if i.zero? %>aria-describedby="type-error"<% end %> data-validation-target="input" data-error-id="type-error"
+                       <% if i.zero? %>data-rules='<%= { required: "Choose a type: Idea, Feature Request or Bug Report." }.to_json %>'<% end %>>
+                <span class="choice-box"><%= icon(info[:icon]) %><span class="choice-title"><%= info[:label] %></span><span class="choice-desc"><%= info[:desc] %></span>
+                  <span class="choice-check" aria-hidden="true"><%= icon(:check) %></span></span>
+              </label>
+            <% end %>
+          </div>
+          <%= error_text("type", err.(:kind)) %>
+        </fieldset>
+
+        <div class="field<%= " is-invalid" if err.(:category) %>">
+          <label class="label" for="category">Category <%= required_mark %></label>
+          <select class="select" id="category" name="suggestion[category_id]" required aria-required="true" aria-describedby="category-error"
+                  data-validation-target="input" data-rules='<%= { required: "Choose a category." }.to_json %>'>
+            <option value="">Choose a category</option>
+            <% Category.ordered.each do |c| %>
+              <option value="<%= c.id %>"<%= " selected" if s.category_id == c.id %>><%= c.name %></option>
+            <% end %>
+          </select>
+          <%= error_text("category", err.(:category)) %>
+        </div>
+
+        <%= form_field id: "description", name: "suggestion[body]", label: "Description", type: :textarea, rows: 8, maxlength: 5000,
+              hint: "Describe the problem or idea and why it matters. At least 20 characters.", value: s.body, error: err.(:body),
+              rules: { required: "Describe your suggestion.", minlength: [ 20, "Add a bit more detail — at least 20 characters." ] } %>
+
+        <div class="form-footer">
+          <p class="small muted"><%= editing ? "Status: #{s.status_label}. Only admins can change it." : "New suggestions start with the status Under Review." %></p>
+          <div class="form-footer-actions">
+            <%= link_to "Cancel", back, class: "btn btn-secondary" %>
+            <button class="btn btn-primary" type="submit"><%= editing ? "Save changes" : "Publish suggestion" %></button>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

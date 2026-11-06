@@ -1,0 +1,36 @@
+<section class="card table-wrap" aria-labelledby="users-title" id="users_table">
+  <div class="panel-head"><h2 class="section-title" id="users-title">All users <span class="count-pill"><%= @users.size %></span></h2>
+    <p class="small muted"><%= @users.count(&:blocked?) %> blocked</p></div>
+  <table class="dtable">
+    <caption class="sr-only">Registered users</caption>
+    <thead><tr><th scope="col">User</th><th scope="col" class="col-joined">Joined</th><th scope="col">Suggestions</th><th scope="col">Status</th><th scope="col"><span class="sr-only">Action</span></th></tr></thead>
+    <tbody>
+      <% @users.each do |u| %>
+        <tr id="<%= dom_id(u) %>">
+          <td class="cell-user" data-label="User"><div class="user-cell"><%= avatar(u) %><div class="od-field"><span class="user-name"><%= u.name %></span><span class="user-email od-truncate"><%= u.email_address %></span></div></div></td>
+          <td class="td-muted col-joined" data-label="Joined"><%= fmt_date(u.created_at) %></td>
+          <td class="num" data-label="Suggestions"><%= @suggestion_counts.fetch(u.id, 0) %></td>
+          <td data-label="Status">
+            <% if u.blocked? %><span class="badge badge-blocked"><%= icon(:lock) %>Blocked</span><% else %><span class="badge badge-active"><%= icon(:check) %>Active</span><% end %>
+          </td>
+          <td class="cell-action">
+            <% if u.admin? %>
+              <span class="tag tag-accent">Admin<%= " · You" if u == current_user %></span>
+            <% elsif u.blocked? %>
+              <%= form_with url: unblock_admin_user_path(u), method: :patch, class: "contents" do %>
+                <button class="btn btn-secondary btn-sm" type="submit" aria-label="Unblock <%= u.name %>"><%= icon(:user_check) %>Unblock</button>
+              <% end %>
+            <% else %>
+              <%= form_with url: block_admin_user_path(u), method: :patch, class: "contents",
+                    data: { controller: "confirm", action: "submit->confirm#ask", confirm_title_value: "Block #{u.name}?",
+                            confirm_body_value: "They can still sign in and browse, but can’t create suggestions, vote, comment or edit their content. Their existing suggestions, comments and votes stay.",
+                            confirm_label_value: "Block user" } do %>
+                <button class="btn btn-danger-outline btn-sm" type="submit" aria-label="Block <%= u.name %>"><%= icon(:user_x) %>Block</button>
+              <% end %>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</section>

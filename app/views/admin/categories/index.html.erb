@@ -1,0 +1,8 @@
+<% content_for :title, "Categories" %>
+<% content_for :nav, "admin-categories" %>
+<% content_for :page, "admin-categories" %>
+<div class="page-container page"><div class="form-narrow">
+  <div class="page-head"><div class="page-head-text"><h1 class="page-title">Categories</h1>
+    <p class="page-lead">Categories help people file suggestions in the right place. Changes apply to the board and the suggestion form right away.</p></div></div>
+  <%= render "admin/categories/admin", new_category: nil %>
+</div></div>

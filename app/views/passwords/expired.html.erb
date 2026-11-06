@@ -1,0 +1,11 @@
+<% content_for :title, "This reset link has expired" %>
+<% content_for :page, "reset" %>
+<div class="auth-page"><div class="card auth-card">
+  <div class="state-icon is-danger"><%= icon(:alert) %></div>
+  <div><h1 class="auth-title">This reset link has expired</h1>
+    <p class="auth-lead">Reset links work only once and for a limited time. Request a new link to choose a password.</p></div>
+  <div class="auth-actions">
+    <%= link_to "Request a new link", new_password_path, class: "btn btn-primary btn-lg btn-block" %>
+    <%= link_to "Back to sign in", new_session_path, class: "btn btn-ghost btn-block" %>
+  </div>
+</div></div>

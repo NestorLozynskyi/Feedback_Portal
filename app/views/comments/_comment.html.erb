@@ -1,0 +1,69 @@
+<%# locals: (comment:, suggestion:, editing: nil) %>
+<% c = comment
+   user = current_user
+   author = c.author
+   own = c.authored_by?(user) %>
+<% if editing == c && c.editable_by?(user) %>
+  <% error = c.errors[:body].first %>
+  <li class="comment" id="comment-<%= c.id %>"><%= avatar(author) %>
+    <div>
+      <div class="comment-head od-cluster"><span class="comment-author"><%= author.name %></span><span class="tag">You</span></div>
+      <%= form_with url: suggestion_comment_path(suggestion, c), method: :patch, scope: :comment, class: "comment-edit", id: "edit-comment-form", html: { novalidate: true },
+            data: { controller: "validation escape-link", action: "submit->validation#submit keydown->escape-link#cancel" } do %>
+        <div class="field<%= " is-invalid" if error %>">
+          <label class="label" for="edit-comment-body">Edit comment</label>
+          <textarea class="textarea" id="edit-comment-body" name="comment[body]" rows="3" maxlength="2000" aria-describedby="edit-comment-body-error" autofocus
+                    data-validation-target="input" data-rules='<%= { required: "A comment can’t be empty. Delete it instead if you no longer need it." }.to_json %>'><%= c.body %></textarea>
+          <%= error_text("edit-comment-body", error) %>
+        </div>
+        <div class="comment-edit-actions">
+          <%= link_to "Cancel", suggestion_path(suggestion, anchor: "comment-#{c.id}"), class: "btn btn-secondary btn-sm", data: { escape_link_target: "cancel" } %>
+          <button class="btn btn-primary btn-sm" type="submit">Save</button>
+        </div>
+      <% end %>
+    </div>
+  </li>
+<% else %>
+  <li class="comment<%= " is-hidden" if c.hidden? %>" id="comment-<%= c.id %>"><%= avatar(author) %>
+    <div>
+      <div class="comment-head od-cluster">
+        <span class="comment-author"><%= author.name %></span>
+        <% if c.author_id == suggestion.author_id %><span class="tag">Author</span><% end %>
+        <% if author.admin? %><span class="tag tag-accent">Team</span><% end %>
+        <% if own %><span class="tag">You</span><% end %>
+        <span class="comment-date"><%= fmt_date(c.created_at) %><%= " · Edited" if c.edited? %></span>
+        <%= hidden_badge if c.hidden? %>
+      </div>
+      <div class="comment-body"><%= paragraphs(c.paragraphs) %></div>
+      <% if c.hidden? %>
+        <p class="comment-note"><%= own && !user.admin? ? "Only you and admins can see this comment." : "Only the author and admins can see this comment." %></p>
+      <% end %>
+      <% delete_data = { turbo_frame: "_top", controller: "confirm", action: "submit->confirm#ask",
+                         confirm_title_value: "Delete this comment?",
+                         confirm_body_value: own ? "This permanently removes your comment. This can’t be undone." : "This permanently removes the comment for everyone, including its author. This can’t be undone.",
+                         confirm_label_value: "Delete comment" } %>
+      <% if own && !c.hidden? && !suggestion.hidden? %>
+        <div class="comment-actions">
+          <% if user.blocked? %>
+            <button class="link-btn" type="button" disabled aria-describedby="restricted-text"><%= icon(:pencil) %>Edit</button>
+            <button class="link-btn is-danger" type="button" disabled aria-describedby="restricted-text"><%= icon(:trash) %>Delete</button>
+          <% else %>
+            <%= link_to edit_suggestion_comment_path(suggestion, c), class: "link-btn" do %><%= icon(:pencil) %>Edit<% end %>
+            <%= form_with url: suggestion_comment_path(suggestion, c), method: :delete, class: "contents", data: delete_data do %>
+              <button class="link-btn is-danger" type="submit"><%= icon(:trash) %>Delete</button>
+            <% end %>
+          <% end %>
+        </div>
+      <% elsif user&.admin? && !own %>
+        <div class="comment-actions">
+          <%= form_with url: (c.hidden? ? unhide_suggestion_comment_path(suggestion, c) : hide_suggestion_comment_path(suggestion, c)), method: :patch, class: "contents", data: { turbo_frame: "_top" } do %>
+            <button class="link-btn" type="submit"><%= icon(c.hidden? ? :eye : :eye_off) %><%= c.hidden? ? "Unhide" : "Hide" %></button>
+          <% end %>
+          <%= form_with url: suggestion_comment_path(suggestion, c), method: :delete, class: "contents", data: delete_data do %>
+            <button class="link-btn is-danger" type="submit"><%= icon(:trash) %>Delete</button>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </li>
+<% end %>

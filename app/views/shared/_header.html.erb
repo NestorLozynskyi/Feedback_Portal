@@ -1,0 +1,42 @@
+<% section = content_for(:nav).to_s %>
+<header class="site-header" id="app-header">
+  <div class="page-container header-inner">
+    <%= link_to root_path, class: "brand" do %>
+      <span class="brand-mark"><%= icon(:logo) %></span><span><%= product_name %></span>
+    <% end %>
+    <nav class="main-nav" aria-label="Main">
+      <%= nav_link "Board", root_path, section == "board" %>
+      <%= nav_link "Roadmap", roadmap_path, section == "roadmap" %>
+      <% if current_user&.admin? %>
+        <%= nav_link "Categories", admin_categories_path, section == "admin-categories" %>
+        <%= nav_link "Users", admin_users_path, section == "admin-users" %>
+      <% end %>
+    </nav>
+    <div class="header-actions">
+      <button class="btn btn-ghost btn-icon" type="button" data-controller="theme" data-action="theme#toggle" aria-label="Switch theme">
+        <%= icon(:moon, "theme-icon-moon") %><%= icon(:sun, "theme-icon-sun") %>
+      </button>
+      <% if current_user %>
+        <div class="menu-wrap" data-controller="menu" data-action="click@window->menu#outside keydown.esc@window->menu#close">
+          <button class="account-btn" type="button" aria-expanded="false" aria-controls="account-menu" aria-label="Account menu for <%= current_user.name %>" data-menu-target="button" data-action="menu#toggle">
+            <%= avatar(current_user) %><span class="account-name hide-sm"><%= current_user.first_name %></span><%= icon(:chevron_down, "icon-sm") %>
+          </button>
+          <div class="menu" id="account-menu" hidden data-menu-target="menu">
+            <div class="menu-head">
+              <span class="menu-head-name"><%= current_user.name %></span>
+              <span class="menu-head-email"><%= current_user.email_address %></span>
+              <% if current_user.admin? %><span><span class="tag tag-accent">Admin</span></span><% end %>
+              <% if current_user.blocked? %><span><span class="badge badge-blocked"><%= icon(:lock) %>Restricted</span></span><% end %>
+            </div>
+            <%= form_with url: session_path, method: :delete do %>
+              <button class="menu-item" type="submit"><%= icon(:log_out, "icon-sm") %>Sign out</button>
+            <% end %>
+          </div>
+        </div>
+      <% else %>
+        <%= link_to "Sign in", new_session_path, class: "btn btn-ghost" %>
+        <%= link_to "Sign up", new_registration_path, class: "btn btn-primary hide-xs" %>
+      <% end %>
+    </div>
+  </div>
+</header>

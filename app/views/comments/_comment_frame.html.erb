@@ -1,0 +1,4 @@
+<%# locals: (comment:, suggestion:, editing: nil) %>
+<%= turbo_frame_tag dom_id(comment, :frame), class: "contents" do %>
+  <%= render "comments/comment", comment: comment, suggestion: suggestion, editing: editing %>
+<% end %>

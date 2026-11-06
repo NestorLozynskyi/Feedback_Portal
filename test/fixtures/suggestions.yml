@@ -1,0 +1,62 @@
+# maya_review: Maya's own, Under Review
+maya_review:
+  title: Keyboard shortcuts for moving tasks
+  body: Shortcuts would make triage much faster for everyone.
+  kind: idea
+  status: under_review
+  author: maya
+  category: ui
+  votes_count: 1
+  created_at: <%= 3.days.ago %>
+
+priya_planned:
+  title: Dark mode for the mobile app
+  body: The mobile apps are always light and that is hard on the eyes.
+  kind: feature
+  status: planned
+  author: priya
+  category: ui
+  votes_count: 2
+  created_at: <%= 5.days.ago %>
+
+priya_progress:
+  title: Board loads slowly with many tasks
+  body: A board with 500 tasks takes ten seconds to load in Chrome.
+  kind: bug
+  status: in_progress
+  author: priya
+  category: performance
+  votes_count: 0
+  created_at: <%= 4.days.ago %>
+
+jordan_completed:
+  title: Require two-factor authentication
+  body: Workspace owners should be able to require 2FA for admins.
+  kind: feature
+  status: completed
+  author: jordan
+  category: security
+  votes_count: 0
+  created_at: <%= 10.days.ago %>
+
+priya_declined:
+  title: Offline mode for the desktop app
+  body: Working on trains with patchy Wi-Fi needs offline mode.
+  kind: idea
+  status: declined
+  author: priya
+  category: performance
+  votes_count: 0
+  created_at: <%= 20.days.ago %>
+
+# Hidden by the moderator; author is Maya; status Planned (roadmap status, but hidden).
+maya_hidden:
+  title: Pin a comment to the top of a task
+  body: Pinning one comment would keep the decision visible to everyone.
+  kind: idea
+  status: planned
+  author: maya
+  category: ui
+  hidden: true
+  votes_count: 0
+  created_at: <%= 1.day.ago %>

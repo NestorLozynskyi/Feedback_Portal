@@ -1,0 +1,10 @@
+<dialog id="confirm-dialog" class="dialog" aria-labelledby="dlg-title" aria-describedby="dlg-body" data-controller="confirm-dialog" data-action="click->confirm-dialog#backdrop">
+  <form method="dialog" class="dialog-inner">
+    <h2 id="dlg-title" class="dialog-title" data-confirm-dialog-target="title"></h2>
+    <p id="dlg-body" class="dialog-body" data-confirm-dialog-target="body"></p>
+    <div class="dialog-actions">
+      <button class="btn btn-secondary" value="cancel" autofocus>Cancel</button>
+      <button class="btn btn-danger" value="confirm" data-confirm-dialog-target="confirm"></button>
+    </div>
+  </form>
+</dialog>

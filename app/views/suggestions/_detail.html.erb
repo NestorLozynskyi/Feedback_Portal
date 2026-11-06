@@ -1,0 +1,81 @@
+<% s = @suggestion
+   user = current_user
+   author = s.author
+   own = s.authored_by?(user) %>
+<div class="detail-layout" id="suggestion_detail">
+  <article class="card detail-main" aria-labelledby="s-title">
+    <% if s.hidden? %>
+      <div class="notice notice-hidden"><%= icon(:eye_off) %>
+        <div class="od-stack" style="--od-gap:2px">
+          <p class="notice-title">Hidden by moderator</p>
+          <p class="notice-text"><%= user&.admin? && !own ? "Only the author and admins can see this suggestion. It’s removed from the board, the roadmap and counts for everyone else." : "Only you and admins can see this suggestion. It’s removed from the board, the roadmap and counts for everyone else. Voting, comments and editing are unavailable." %></p>
+        </div>
+      </div>
+    <% end %>
+    <div class="meta od-cluster"><%= status_badge(s.status) %><%= kind_chip(s) %><%= category_chip(s) %></div>
+    <h1 class="detail-title" id="s-title"><%= s.title %></h1>
+    <div class="byline od-row"><%= avatar(author, "avatar-lg") %>
+      <div class="od-field">
+        <span class="byline-name"><%= author.name %><%= " (you)" if own %></span>
+        <span class="byline-date">Posted <%= fmt_date(s.created_at) %><% if s.edited? %> · Edited <%= fmt_date(s.edited_at) %><% end %></span>
+      </div>
+    </div>
+    <div class="prose"><%= paragraphs(s.paragraphs) %></div>
+    <div class="detail-actions">
+      <%= render "votes/button", suggestion: s, voted: @voted, variant: "large" %>
+      <% if own && !s.hidden? %>
+        <div class="owner-actions">
+          <% if user.blocked? %>
+            <button class="btn btn-secondary" type="button" disabled aria-describedby="restricted-text"><%= icon(:pencil) %>Edit</button>
+            <button class="btn btn-danger-outline" type="button" disabled aria-describedby="restricted-text"><%= icon(:trash) %>Delete</button>
+          <% else %>
+            <%= link_to edit_suggestion_path(s), class: "btn btn-secondary" do %><%= icon(:pencil) %>Edit<% end %>
+            <%= render "suggestions/delete_form", suggestion: s, label: "Delete", css: "btn btn-danger-outline" %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </article>
+
+  <aside class="detail-aside" aria-label="Suggestion status<%= " and moderation" if user&.admin? %>">
+    <section class="card side-card" aria-labelledby="status-card-title">
+      <h2 class="card-label" id="status-card-title">Status</h2>
+      <%= status_badge(s.status, big: true) %>
+      <p class="small muted"><%= s.status_desc %></p>
+      <% if s.on_roadmap? && !s.hidden? %><%= link_to "View the roadmap", roadmap_path, class: "link-sm" %><% end %>
+    </section>
+    <% if user&.admin? %>
+      <section class="card side-card mod-card" aria-labelledby="mod-title">
+        <h2 class="card-title" id="mod-title">Moderation</h2>
+        <%= form_with url: status_suggestion_path(s), method: :patch, id: "status-form", class: "od-stack", style: "--od-gap:12px" do %>
+          <div class="field">
+            <label class="label" for="status-select">Status</label>
+            <select class="select" id="status-select" name="status" aria-describedby="status-hint">
+              <% Suggestion::STATUSES.each do |key, info| %>
+                <option value="<%= key %>"<%= " selected" if key == s.status %>><%= info[:label] %></option>
+              <% end %>
+            </select>
+            <p class="hint" id="status-hint">Planned, In Progress and Completed appear on the public roadmap.</p>
+          </div>
+          <button class="btn btn-secondary btn-block" type="submit">Update status</button>
+        <% end %>
+        <hr class="divider">
+        <div class="od-stack">
+          <% if s.hidden? %>
+            <%= form_with url: unhide_suggestion_path(s), method: :patch, class: "contents" do %>
+              <button class="btn btn-secondary btn-block" type="submit"><%= icon(:eye) %>Unhide suggestion</button>
+            <% end %>
+          <% else %>
+            <%= form_with url: hide_suggestion_path(s), method: :patch, class: "contents" do %>
+              <button class="btn btn-secondary btn-block" type="submit"><%= icon(:eye_off) %>Hide suggestion</button>
+            <% end %>
+          <% end %>
+          <%= render "suggestions/delete_form", suggestion: s, label: "Delete suggestion", css: "btn btn-danger-outline btn-block" %>
+        </div>
+        <p class="hint">Hidden suggestions are visible only to their author and admins.</p>
+      </section>
+    <% end %>
+  </aside>
+
+  <%= render "comments/section", suggestion: s, comments: @comments, new_comment: nil %>
+</div>

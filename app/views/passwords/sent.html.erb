@@ -1,0 +1,15 @@
+<% content_for :title, "Check your email" %>
+<% content_for :page, "forgot" %>
+<div class="auth-page"><div class="card auth-card">
+  <div class="state-icon"><%= icon(:mail) %></div>
+  <div><h1 class="auth-title" tabindex="-1" data-controller="autofocus">Check your email</h1>
+    <p class="auth-lead">If an account exists for <strong><%= @email %></strong>, we’ve sent a link to reset your password.</p></div>
+  <div class="auth-actions">
+    <%= link_to "Back to sign in", new_session_path, class: "btn btn-primary btn-lg btn-block" %>
+    <%= form_with url: passwords_path, class: "contents" do %>
+      <input type="hidden" name="email_address" value="<%= @email %>">
+      <input type="hidden" name="resend" value="1">
+      <button class="btn btn-ghost btn-block" type="submit">Didn’t get it? Send the link again</button>
+    <% end %>
+  </div>
+</div></div>

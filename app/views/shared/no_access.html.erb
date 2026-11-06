@@ -1,0 +1,12 @@
+<% content_for :title, current_user ? "No access" : "Sign in to continue" %>
+<div class="page-container page">
+  <% if current_user %>
+    <%= empty_state(:shield, "You don’t have access to this page", "Only the portal admin can manage categories and users.", heading: :h1) do %>
+      <%= link_to "Back to board", root_path, class: "btn btn-secondary" %>
+    <% end %>
+  <% else %>
+    <%= empty_state(:lock, "Sign in to continue", "This page is for the portal admin.", heading: :h1) do %>
+      <%= link_to "Sign in", signin_path_for("admin"), class: "btn btn-primary" %>
+    <% end %>
+  <% end %>
+</div>

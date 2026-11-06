@@ -1,0 +1,42 @@
+<% content_for :title, "Feedback board" %>
+<% content_for :nav, "board" %>
+<% content_for :page, "board" %>
+<div class="page-container page">
+  <div class="page-head">
+    <div class="page-head-text">
+      <h1 class="page-title">Feedback board</h1>
+      <p class="page-lead">Share ideas, request features and report bugs in <%= product_name %>. Upvote the suggestions that matter to you.</p>
+    </div>
+    <div class="page-head-actions"><%= render "suggestions/create_button" %></div>
+  </div>
+
+  <% if @suggestions.any? %>
+    <div class="toolbar">
+      <p class="toolbar-count"><%= plural_count(@suggestions.size, "suggestion") %></p>
+      <nav class="segmented" aria-label="Sort suggestions">
+        <%= link_to "Newest", root_path, aria: { current: (@sort == "newest" ? "true" : nil) } %>
+        <%= link_to "Most votes", root_path(sort: "votes"), aria: { current: (@sort == "votes" ? "true" : nil) } %>
+      </nav>
+    </div>
+    <ul class="s-list" role="list" id="suggestions">
+      <% @suggestions.each do |s| %>
+        <% n = @comment_counts.fetch(s.id, 0) %>
+        <li class="s-row<%= " is-hidden" if s.hidden? %>" id="<%= dom_id(s) %>">
+          <%= render "votes/button", suggestion: s, voted: @voted_ids.include?(s.id), variant: "compact" %>
+          <div class="s-row-body">
+            <h2 class="s-row-title"><%= link_to s.title, suggestion_path(s), class: "od-clamp-2" %></h2>
+            <p class="s-row-excerpt od-clamp-2"><%= s.excerpt %></p>
+            <div class="meta od-cluster">
+              <%= hidden_badge if s.hidden? %><%= status_badge(s.status) %><%= kind_chip(s) %><%= category_chip(s) %>
+              <span class="meta-item"><%= icon(:message) %><span><%= n %><span class="sr-only"> <%= n == 1 ? "comment" : "comments" %></span></span></span>
+            </div>
+          </div>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <%= empty_state(:inbox, "No suggestions yet", "Be the first to share an idea, request a feature or report a bug.#{" Sign in to get started." unless current_user}") do %>
+      <%= render "suggestions/create_button" unless current_user&.blocked? %>
+    <% end %>
+  <% end %>
+</div>

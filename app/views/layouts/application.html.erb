@@ -1,44 +1,33 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <title><%= content_for(:title) || "Feedback Portal" %></title>
+    <meta charset="utf-8">
+    <title><%= page_title(content_for(:title).presence) %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="application-name" content="Feedback Portal">
-    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="<%= product_name %>">
+    <script>try{var t=localStorage.getItem('fp-theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t}catch(e){document.documentElement.dataset.theme='light'}</script>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
-
     <%= yield :head %>
-
-    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
-    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
-
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
-
-    <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="min-h-screen bg-gray-50">
-    <header class="border-b border-gray-200 bg-white">
-      <nav class="container mx-auto flex h-16 items-center justify-between px-5">
-        <%= link_to "Feedback Portal", root_path, class: "text-lg font-semibold text-gray-900" %>
-        <div class="flex items-center gap-4 text-sm">
-          <% if authenticated? %>
-            <span class="text-gray-600"><%= Current.user.email_address %></span>
-            <%= button_to "Sign out", session_path, method: :delete, class: "rounded-md border border-gray-300 px-3 py-1.5 font-medium text-gray-700 hover:bg-gray-100 cursor-pointer" %>
-          <% else %>
-            <%= link_to "Sign in", new_session_path, class: "font-medium text-blue-600 hover:underline" %>
-          <% end %>
-        </div>
-      </nav>
-    </header>
-    <main class="container mx-auto mt-16 px-5 flex">
+  <body data-page="<%= content_for(:page) %>">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <%= render "shared/header" %>
+    <div id="app-banner"><%= render "shared/restricted_banner" if restricted? %></div>
+    <main id="main" tabindex="-1">
       <%= yield %>
     </main>
+    <div class="toast-region" id="toasts" role="status" aria-live="polite">
+      <% flash.each do |type, message| %>
+        <%= render "shared/toast", message: message, kind: type %>
+      <% end %>
+    </div>
+    <%= render "shared/confirm_dialog" %>
   </body>
 </html>
